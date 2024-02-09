@@ -57,15 +57,13 @@ function fixUnit(unit) {
 // Luxon does not currently have weekInfo by culture
 // Luxon uses 1 based values for month and weekday
 // So we default to Sunday (7)
-export default function(DateTime, { firstDayOfWeek = 7 } = {}) {
+export default function (DateTime, { firstDayOfWeek = 7 } = {}) {
   function formatDate(value, format) {
     return DateTime.fromJSDate(value).toFormat(format)
   }
 
   function formatDateWithCulture(value, culture, format) {
-    return DateTime.fromJSDate(value)
-      .setLocale(culture)
-      .format(format)
+    return DateTime.fromJSDate(value).setLocale(culture).toFormat(format)
   }
 
   /*** BEGIN localized date arithmetic methods with Luxon ***/
@@ -241,7 +239,7 @@ export default function(DateTime, { firstDayOfWeek = 7 } = {}) {
     // don't use 'defineComparators' here, as we don't want to mutate the values
     const dtA = DateTime.fromJSDate(a)
     const dtB = DateTime.fromJSDate(b)
-    return Math.round(
+    return Math.floor(
       dtB.diff(dtA, datePart, { conversionAccuracy: 'longterm' }).toObject()[
         datePart
       ]
@@ -310,6 +308,12 @@ export default function(DateTime, { firstDayOfWeek = 7 } = {}) {
     return gte(end, last)
   }
 
+  function daySpan(start, end) {
+    const dtStart = DateTime.fromJSDate(start)
+    const dtEnd = DateTime.fromJSDate(end)
+    return dtEnd.diff(dtStart).as('days')
+  }
+
   // These two are used by eventLevels
   function sortEvents({
     evtA: { start: aStart, end: aEnd, allDay: aAllDay },
@@ -317,13 +321,13 @@ export default function(DateTime, { firstDayOfWeek = 7 } = {}) {
   }) {
     const startSort = +startOf(aStart, 'day') - +startOf(bStart, 'day')
 
-    const durA = diff(aStart, ceil(aEnd, 'day'), 'day')
+    const durA = daySpan(aStart, aEnd)
 
-    const durB = diff(bStart, ceil(bEnd, 'day'), 'day')
+    const durB = daySpan(bStart, bEnd)
 
     return (
       startSort || // sort by start Day first
-      Math.max(durB, 1) - Math.max(durA, 1) || // events spanning multiple days go first
+      durB - durA || // events spanning multiple days go first
       !!bAllDay - !!aAllDay || // then allDay single day events
       +aStart - +bStart || // then sort by start time *don't need moment conversion here
       +aEnd - +bEnd // then sort by end time *don't need moment conversion here either
@@ -415,6 +419,7 @@ export default function(DateTime, { firstDayOfWeek = 7 } = {}) {
     sortEvents,
     inEventRange,
     isSameDate,
+    daySpan,
     browserTZOffset,
   })
 }

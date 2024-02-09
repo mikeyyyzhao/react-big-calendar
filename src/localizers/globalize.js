@@ -1,3 +1,5 @@
+// TODO: fix the globalizeLocalizer to work with globalize 1.x
+
 import * as dates from '../utils/dates'
 import oldGlobalize from './oldGlobalize'
 import { DateLocalizer } from '../localizer'
@@ -45,8 +47,8 @@ export let formats = {
   agendaTimeRangeFormat: timeRangeFormat,
 }
 
-export default function(globalize) {
-  let locale = culture => (culture ? globalize(culture) : globalize)
+export default function (globalize) {
+  let locale = (culture) => (culture ? globalize(culture) : globalize)
 
   // return the first day of the week from the locale data. Defaults to 'world'
   // territory if no territory is derivable from CLDR.
