@@ -160,8 +160,22 @@ function isLeafTouchingEvent(event, row) {
   })
 }
 
+function isContainedWithin (eventA, eventB) {
+  return eventB.startMs >= eventA.startMs && eventB.endMs <= eventA.endMs
+}
+
 function sortByRender(events) {
-  const sortedByTime = sortBy(events, ['startMs', e => -e.endMs])
+  // First sort by start time, then by duration (shorter events later)
+  const sortedByTime = sortBy(events, [
+    'startMs',
+    (eventA, eventB) => {
+      // If one event contains the other, the containing event should come first
+      if (isContainedWithin(eventA, eventB)) return -1
+      if (isContainedWithin(eventB, eventA)) return 1
+      // Otherwise fall back to the original logic of longer events first
+      return -eventA.endMs
+    }
+  ])
 
   const sorted = []
   while (sortedByTime.length > 0) {
@@ -175,14 +189,11 @@ function sortByRender(events) {
       if (event.endMs > test.startMs) continue
 
       // We've found the first event of the next event group.
-      // If that event is not right next to our current event, we have to
-      // move it here.
       if (i > 0) {
         const event = sortedByTime.splice(i, 1)[0]
         sorted.push(event)
       }
 
-      // We've already found the next event group, so stop looking.
       break
     }
   }
