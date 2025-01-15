@@ -1021,6 +1021,7 @@ class Calendar extends React.Component {
       culture: _3,
       ...props
     } = this.props
+    console.log("render calendar!"); // TODO: delete
 
     current = current || getNow()
 
