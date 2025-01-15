@@ -47,7 +47,6 @@ import sortBy from 'lodash/sortBy'
 
 class Event {
   constructor(data, { accessors, slotMetrics }) {
-    console.log("constructor in events"); // TODO: delete
     const {
       start,
       startDate,
@@ -162,7 +161,6 @@ function isLeafTouchingEvent(event, row) {
 }
 
 function sortByRender(events) {
-  console.log("here_"); // TODO: delete
   // First sort by start time, then by duration (shorter events later)
   const sortedByTime = sortBy(events, [
     'startMs',
@@ -207,7 +205,6 @@ export default function getStyledEvents({
   const proxies = events.map(
     event => new Event(event, { slotMetrics, accessors })
   )
-  console.log("here_2"); // TODO: delete
   const eventsInRenderOrder = sortByRender(proxies)
 
   // Group overlapping events, while keeping order.
