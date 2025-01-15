@@ -47,6 +47,7 @@ import sortBy from 'lodash/sortBy'
 
 class Event {
   constructor(data, { accessors, slotMetrics }) {
+    console.log("constructor in events"); // TODO: delete
     const {
       start,
       startDate,
