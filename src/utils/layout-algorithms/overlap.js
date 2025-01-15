@@ -161,7 +161,15 @@ function isLeafTouchingEvent(event, row) {
 }
 
 function sortByRender(events) {
-  const sortedByTime = sortBy(events, ['startMs', e => -e.endMs])
+  console.log("here_"); // TODO: delete
+  // First sort by start time, then by duration (shorter events later)
+  const sortedByTime = sortBy(events, [
+    'startMs',
+    // Sort by duration (ascending) so shorter events come later
+    event => event.endMs - event.startMs,
+    // If durations are equal, end later events should come last
+    event => -event.endMs
+  ])
 
   const sorted = []
   while (sortedByTime.length > 0) {
@@ -175,14 +183,11 @@ function sortByRender(events) {
       if (event.endMs > test.startMs) continue
 
       // We've found the first event of the next event group.
-      // If that event is not right next to our current event, we have to
-      // move it here.
       if (i > 0) {
         const event = sortedByTime.splice(i, 1)[0]
         sorted.push(event)
       }
 
-      // We've already found the next event group, so stop looking.
       break
     }
   }
@@ -201,6 +206,7 @@ export default function getStyledEvents({
   const proxies = events.map(
     event => new Event(event, { slotMetrics, accessors })
   )
+  console.log("here_2"); // TODO: delete
   const eventsInRenderOrder = sortByRender(proxies)
 
   // Group overlapping events, while keeping order.
