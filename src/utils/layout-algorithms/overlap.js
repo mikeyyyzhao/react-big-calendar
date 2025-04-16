@@ -714,7 +714,7 @@ export default function getStyledEvents({
   }
 
   // Return the original events, along with their styles.
-  return eventsInRenderOrder.map(event => ({
+  return eventsInRenderOrder.map((event) => ({
     event: event.data,
     style: {
       top: event.top,
