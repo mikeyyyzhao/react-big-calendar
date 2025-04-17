@@ -1,4 +1,4 @@
-import { isSameMinute } from 'date-fns'
+import { isSameMinute } from './dates'
 
 /**
  * Copied from the frontend's typeGuards file.
@@ -102,7 +102,7 @@ export function mergeRanges(ranges, mergeAdjacent = true) {
    * @type {{ point: T, position: "start" | "end" }[]}
    */
   const extrema = []
-  ranges.forEach(range => {
+  ranges.forEach((range) => {
     if (arePointsEqual(range.start, range.end)) {
       return
     }
