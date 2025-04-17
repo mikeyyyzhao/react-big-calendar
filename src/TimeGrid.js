@@ -41,7 +41,7 @@ export default class TimeGrid extends Component {
     window.addEventListener('resize', this.handleResize)
   }
 
-  handleScroll = e => {
+  handleScroll = (e) => {
     if (this.scrollRef.current) {
       this.scrollRef.current.scrollLeft = e.target.scrollLeft
     }
@@ -82,7 +82,7 @@ export default class TimeGrid extends Component {
     }
   }
 
-  gutterRef = ref => {
+  gutterRef = (ref) => {
     this.gutter = ref && findDOMNode(ref)
   }
 
@@ -109,14 +109,8 @@ export default class TimeGrid extends Component {
   }
 
   renderEvents(range, events, backgroundEvents, now) {
-    let {
-      min,
-      max,
-      components,
-      accessors,
-      localizer,
-      dayLayoutAlgorithm,
-    } = this.props
+    let { min, max, components, accessors, localizer, dayLayoutAlgorithm } =
+      this.props
 
     const resources = this.memoizedResources(this.props.resources, accessors)
     const groupedEvents = resources.groupEvents(events)
@@ -124,7 +118,7 @@ export default class TimeGrid extends Component {
 
     return resources.map(([id, resource], i) =>
       range.map((date, jj) => {
-        let daysEvents = (groupedEvents.get(id) || []).filter(event =>
+        let daysEvents = (groupedEvents.get(id) || []).filter((event) =>
           localizer.inRange(
             date,
             accessors.start(event),
@@ -135,7 +129,7 @@ export default class TimeGrid extends Component {
 
         let daysBackgroundEvents = (
           groupedBackgroundEvents.get(id) || []
-        ).filter(event =>
+        ).filter((event) =>
           localizer.inRange(
             date,
             accessors.start(event),
@@ -196,7 +190,7 @@ export default class TimeGrid extends Component {
       rangeEvents = [],
       rangeBackgroundEvents = []
 
-    events.forEach(event => {
+    events.forEach((event) => {
       if (inRange(event, start, end, accessors, localizer)) {
         let eStart = accessors.start(event),
           eEnd = accessors.end(event)
@@ -213,7 +207,7 @@ export default class TimeGrid extends Component {
       }
     })
 
-    backgroundEvents.forEach(event => {
+    backgroundEvents.forEach((event) => {
       if (inRange(event, start, end, accessors, localizer)) {
         rangeBackgroundEvents.push(event)
       }
@@ -302,7 +296,8 @@ export default class TimeGrid extends Component {
   }
 
   applyScroll() {
-    if (this._scrollRatio) {
+    // If auto-scroll is disabled, we don't actually apply the scroll
+    if (this._scrollRatio != null && this.props.enableAutoScroll === true) {
       const content = this.contentRef.current
       content.scrollTop = content.scrollHeight * this._scrollRatio
       // Only do this once
@@ -351,6 +346,7 @@ TimeGrid.propTypes = {
   getNow: PropTypes.func.isRequired,
 
   scrollToTime: PropTypes.instanceOf(Date).isRequired,
+  enableAutoScroll: PropTypes.bool,
   showMultiDayTimes: PropTypes.bool,
 
   rtl: PropTypes.bool,
