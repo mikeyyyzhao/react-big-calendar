@@ -22,5 +22,29 @@
         "code": 75663
       }
     }
+  },
+  "react-big-calendar.js": {
+    "bundled": 2193712,
+    "minified": 527761,
+    "gzipped": 165198
+  },
+  "react-big-calendar.min.js": {
+    "bundled": 364593,
+    "minified": 362700,
+    "gzipped": 116643
+  },
+  "react-big-calendar.esm.js": {
+    "bundled": 228783,
+    "minified": 103131,
+    "gzipped": 26852,
+    "treeshaked": {
+      "rollup": {
+        "code": 74287,
+        "import_statements": 1947
+      },
+      "webpack": {
+        "code": 78162
+      }
+    }
   }
 }
