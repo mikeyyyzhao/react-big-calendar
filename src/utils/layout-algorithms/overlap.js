@@ -134,7 +134,7 @@ export class EventRange {
     }
 
     const maxChildDepth = Math.max(
-      ...this.childRanges.map(range => range.maxDepth)
+      ...this.childRanges.map((range) => range.maxDepth)
     )
     this._maxDepth = maxChildDepth
     return this._maxDepth
@@ -180,7 +180,7 @@ export class EventRange {
    * @param {EventRange[]} ranges
    */
   addRanges(ranges) {
-    ranges.forEach(range => {
+    ranges.forEach((range) => {
       range.parentRange = this
       this.childRanges.push(range)
     })
@@ -237,14 +237,8 @@ export class EventRange {
  */
 export class Event {
   constructor(data, { accessors, slotMetrics, minimumStartDifference = 0 }) {
-    const {
-      start,
-      startDate,
-      end,
-      endDate,
-      top,
-      height,
-    } = slotMetrics.getRange(accessors.start(data), accessors.end(data))
+    const { start, startDate, end, endDate, top, height } =
+      slotMetrics.getRange(accessors.start(data), accessors.end(data))
 
     /**
      * Save this value since it's useful when building the event tree.
@@ -321,15 +315,15 @@ export class Event {
     while (rangesToCheck.length > 0) {
       const nextRanges = []
 
-      rangesToCheck.forEach(parentRange => {
+      rangesToCheck.forEach((parentRange) => {
         nextRanges.push(...parentRange.childRanges)
 
-        parentRange.events.forEach(parentEvent => {
+        parentRange.events.forEach((parentEvent) => {
           parentEvent._childEvents ||= []
           parentEvent._parentEvents ||= []
 
-          parentRange.childRanges.forEach(childRange => {
-            childRange.events.forEach(childEvent => {
+          parentRange.childRanges.forEach((childRange) => {
+            childRange.events.forEach((childEvent) => {
               if (
                 isItemInRange(
                   childEvent,
@@ -385,7 +379,7 @@ export class Event {
     if (this.childEvents.length > 0) {
       let mostRestrictiveCompareFactor = null
       let mostRestrictiveDetails = null
-      this.childEvents.forEach(event => {
+      this.childEvents.forEach((event) => {
         const { openRanges, maxLocalDepth } = event.expansionDetails
         const compareFactor = openRanges / (maxLocalDepth + 1)
 
@@ -410,7 +404,7 @@ export class Event {
   }
 
   get isHiddenEvent() {
-    return this.data?.is_hidden
+    return this.data?.is_hidden || this.data?.is_recurring_event_hidden
   }
 
   /**
@@ -438,8 +432,8 @@ export class Event {
 
     // Dig through the ranges below this event to find the first blocking event.
     while (rangesToCheck.length > 0) {
-      const blockedRanges = rangesToCheck.filter(range => {
-        const isBlocked = range.blockedTimes.some(blockedTime =>
+      const blockedRanges = rangesToCheck.filter((range) => {
+        const isBlocked = range.blockedTimes.some((blockedTime) =>
           isItemInRange(this, blockedTime, this.minimumStartDifference)
         )
         if (!isBlocked) {
@@ -457,8 +451,8 @@ export class Event {
         }
 
         let minimumOpenRanges = null
-        blockedRanges.forEach(range => {
-          range.events.forEach(event => {
+        blockedRanges.forEach((range) => {
+          range.events.forEach((event) => {
             if (isItemInRange(this, event)) {
               if (
                 minimumOpenRanges === null ||
@@ -505,7 +499,7 @@ export class Event {
        * @type {Event | null}
        */
       let rightmostParent = null
-      this.parentEvents.forEach(event => {
+      this.parentEvents.forEach((event) => {
         if (!rightmostParent) {
           rightmostParent = event
         }
@@ -598,7 +592,7 @@ export class Event {
     if (this.expansionDetails.openRanges > 0) {
       const parentsMaxWidth = Math.max(
         0,
-        ...this.parentEvents.map(event => {
+        ...this.parentEvents.map((event) => {
           return event.xOffset + event.baseWidth
         })
       )
@@ -647,7 +641,7 @@ function isItemInRange(item, range, minimumStartDifference = 0) {
  * @returns {Event[]}
  */
 function sortByTime(events) {
-  return sortBy(events, ['startMs', e => -e.endMs])
+  return sortBy(events, ['startMs', (e) => -e.endMs])
 }
 
 export default function getStyledEvents({
@@ -659,7 +653,7 @@ export default function getStyledEvents({
   // Create proxy events and order them so that we don't have
   // to fiddle with z-indexes.
   const proxies = events.map(
-    event =>
+    (event) =>
       new Event(event, { slotMetrics, accessors, minimumStartDifference })
   )
   const sortedEvents = sortByTime(proxies)
@@ -678,11 +672,11 @@ export default function getStyledEvents({
   /**
    * @param {EventRange} eventRange
    */
-  const addEventsFromRange = eventRange => {
-    eventRange.hiddenEvents.forEach(event => {
+  const addEventsFromRange = (eventRange) => {
+    eventRange.hiddenEvents.forEach((event) => {
       eventsInRenderOrder.push(event)
     })
-    eventRange.events.forEach(event => {
+    eventRange.events.forEach((event) => {
       eventsInRenderOrder.push(event)
     })
     eventRange.childRanges.forEach(addEventsFromRange)
@@ -690,7 +684,7 @@ export default function getStyledEvents({
 
   eventRanges.forEach(addEventsFromRange)
 
-  const getWidth = event => {
+  const getWidth = (event) => {
     const defaultWidth = event.width
     if (defaultWidth === 100 && event.range.hasHiddenEvents) {
       return `calc(100% - ${HIDDEN_EVENT_WIDTH})`
@@ -698,7 +692,7 @@ export default function getStyledEvents({
     return defaultWidth
   }
 
-  const getXOffset = event => {
+  const getXOffset = (event) => {
     const defaultOffset = Math.max(0, event.xOffset)
     if (defaultOffset > 0) {
       //if not 0 -> return default offset
@@ -735,14 +729,14 @@ export default function getStyledEvents({
  * @returns {EventRange[]}
  */
 export function createNestedRanges(sortedEvents, minimumStartDifference) {
-  const plainRanges = sortedEvents.map(event => ({
+  const plainRanges = sortedEvents.map((event) => ({
     start: event.start,
     end: Math.max(event.end, event.start + minimumStartDifference),
   }))
   const mergedRanges = mergeRanges(plainRanges, false)
   let remainingEvents = sortedEvents
 
-  const eventRanges = mergedRanges.map(range => {
+  const eventRanges = mergedRanges.map((range) => {
     const {
       eventRange,
       childEvents,
@@ -792,7 +786,7 @@ function createEventRange(range, sortedEvents, minimumStartDifference) {
   // - Events directly in this range (not in a parent or child)
   // - Events that are in this range's child ranges
   // - Events that are outside of this range completely
-  sortedEvents.forEach(event => {
+  sortedEvents.forEach((event) => {
     if (!eventRange.isEventInRange(event)) {
       remainingEvents.push(event)
       return
