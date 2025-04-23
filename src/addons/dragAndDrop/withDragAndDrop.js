@@ -72,7 +72,7 @@ export default function withDragAndDrop(Calendar) {
       }
     }
 
-    defaultOnDragOver = event => {
+    defaultOnDragOver = (event) => {
       event.preventDefault()
     }
 
@@ -86,7 +86,7 @@ export default function withDragAndDrop(Calendar) {
       if (this.state.interacting === false) this.setState({ interacting: true })
     }
 
-    handleInteractionEnd = interactionInfo => {
+    handleInteractionEnd = (interactionInfo) => {
       const { action, event } = this.state
       if (!action) return
 
