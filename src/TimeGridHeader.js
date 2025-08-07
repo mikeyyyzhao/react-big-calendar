@@ -84,6 +84,7 @@ class TimeGridHeader extends React.Component {
         rtl={rtl}
         getNow={getNow}
         minRows={2}
+        maxRows={3}
         range={range}
         events={eventsToDisplay}
         resourceId={resourceId}
@@ -98,6 +99,7 @@ class TimeGridHeader extends React.Component {
         onDoubleClick={this.props.onDoubleClickEvent}
         onKeyPress={this.props.onKeyPressEvent}
         onSelectSlot={this.props.onSelectSlot}
+        onShowMore={this.props.onShowMore}
         longPressThreshold={this.props.longPressThreshold}
         resizable={resizable}
       />
@@ -171,6 +173,7 @@ class TimeGridHeader extends React.Component {
               rtl={rtl}
               getNow={getNow}
               minRows={2}
+              maxRows={3}
               range={range}
               events={groupedEvents.get(id) || []}
               resourceId={resource && id}
@@ -185,6 +188,7 @@ class TimeGridHeader extends React.Component {
               onDoubleClick={this.props.onDoubleClickEvent}
               onKeyPress={this.props.onKeyPressEvent}
               onSelectSlot={this.props.onSelectSlot}
+              onShowMore={this.props.onShowMore}
               longPressThreshold={this.props.longPressThreshold}
               resizable={resizable}
             />
@@ -219,6 +223,7 @@ TimeGridHeader.propTypes = {
   onSelectEvent: PropTypes.func,
   onDoubleClickEvent: PropTypes.func,
   onKeyPressEvent: PropTypes.func,
+  onShowMore: PropTypes.func,
   onDrillDown: PropTypes.func,
   getDrilldownView: PropTypes.func.isRequired,
   scrollRef: PropTypes.any,
