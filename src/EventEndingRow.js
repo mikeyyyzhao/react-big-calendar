@@ -79,20 +79,36 @@ class EventEndingRow extends React.Component {
     let count = eventsInSlot(segments, slot)
 
     return count ? (
-      <button
-        type="button"
-        key={'sm_' + slot}
-        className={clsx('rbc-button-link', 'rbc-show-more')}
-        onClick={(e) => this.showMore(slot, e)}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
       >
-        {localizer.messages.showMore(count)}
-      </button>
+        <button
+          type="button"
+          key={'sm_' + slot}
+          className={clsx('rbc-button-link', 'rbc-show-more')}
+          onClick={(e) => this.showMore(slot, e)}
+          onMouseDown={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
+        >
+          {localizer.messages.showMore(count)}
+        </button>
+      </div>
     ) : (
       false
     )
   }
 
   showMore(slot, e) {
+    // Prevent event from bubbling up to parent components
+    e.preventDefault()
+    e.stopPropagation()
+
     if (this.props.onShowMore) {
       this.props.onShowMore(e, slot)
     }
