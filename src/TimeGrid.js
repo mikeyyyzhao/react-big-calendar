@@ -108,6 +108,13 @@ export default class TimeGrid extends Component {
     })
   }
 
+  handleShowMore = (events, date, slot, target) => {
+    const { onShowMore } = this.props
+    if (onShowMore) {
+      onShowMore(events, date, slot, target)
+    }
+  }
+
   renderEvents(range, events, backgroundEvents, now) {
     let { min, max, components, accessors, localizer, dayLayoutAlgorithm } =
       this.props
@@ -243,6 +250,7 @@ export default class TimeGrid extends Component {
           onDoubleClickEvent={this.props.onDoubleClickEvent}
           onKeyPressEvent={this.props.onKeyPressEvent}
           onDrillDown={this.props.onDrillDown}
+          onShowMore={this.handleShowMore}
           getDrilldownView={this.props.getDrilldownView}
           resizable={resizable}
         />
@@ -296,8 +304,7 @@ export default class TimeGrid extends Component {
   }
 
   applyScroll() {
-    // If auto-scroll is disabled, we don't actually apply the scroll
-    if (this._scrollRatio != null && this.props.enableAutoScroll === true) {
+    if (this._scrollRatio) {
       const content = this.contentRef.current
       content.scrollTop = content.scrollHeight * this._scrollRatio
       // Only do this once
@@ -346,7 +353,6 @@ TimeGrid.propTypes = {
   getNow: PropTypes.func.isRequired,
 
   scrollToTime: PropTypes.instanceOf(Date).isRequired,
-  enableAutoScroll: PropTypes.bool,
   showMultiDayTimes: PropTypes.bool,
 
   rtl: PropTypes.bool,
@@ -369,6 +375,7 @@ TimeGrid.propTypes = {
   onSelectEvent: PropTypes.func,
   onDoubleClickEvent: PropTypes.func,
   onKeyPressEvent: PropTypes.func,
+  onShowMore: PropTypes.func,
   onDrillDown: PropTypes.func,
   getDrilldownView: PropTypes.func.isRequired,
 
