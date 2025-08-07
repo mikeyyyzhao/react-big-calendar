@@ -108,6 +108,13 @@ export default class TimeGrid extends Component {
     })
   }
 
+  handleShowMore = (events, date, slot, target) => {
+    const { onShowMore } = this.props
+    if (onShowMore) {
+      onShowMore(events, date, slot, target)
+    }
+  }
+
   renderEvents(range, events, backgroundEvents, now) {
     let {
       min,
@@ -248,6 +255,7 @@ export default class TimeGrid extends Component {
           onSelectEvent={this.handleSelectAlldayEvent}
           onDoubleClickEvent={this.props.onDoubleClickEvent}
           onKeyPressEvent={this.props.onKeyPressEvent}
+          onShowMore={this.handleShowMore}
           onDrillDown={this.props.onDrillDown}
           getDrilldownView={this.props.getDrilldownView}
           resizable={resizable}
@@ -373,6 +381,7 @@ TimeGrid.propTypes = {
   onSelectEvent: PropTypes.func,
   onDoubleClickEvent: PropTypes.func,
   onKeyPressEvent: PropTypes.func,
+  onShowMore: PropTypes.func,
   onDrillDown: PropTypes.func,
   getDrilldownView: PropTypes.func.isRequired,
 

@@ -1,6 +1,6 @@
 {
   "name": "rbc-fork-react-big-calendar",
-  "version": "0.33.77",
+  "version": "0.33.78",
   "description": "Calendar! with events",
   "author": {
     "name": "Jason Quense",
@@ -39,11 +39,11 @@
     "build:css": "yarn sass && yarn autoprefixer",
     "assets": "cpy src/sass/* lib/sass && yarn assets-addons",
     "assets-addons": "cpy addons/**/*.scss ../lib/ --cwd=src --parents",
-    "build:umd": "BABEL_ENV=esm yarn rollup -c",
+    "build:umd": "BABEL_ENV=esm NODE_OPTIONS=--openssl-legacy-provider yarn rollup -c",
     "build:cjs": "babel src --out-dir lib",
     "build": "yarn clean && yarn build:cjs && yarn build:umd && yarn assets && yarn build:css",
-    "build:examples": "yarn clean:examples && webpack --config examples/webpack.config.js",
-    "examples": "yarn clean:examples && webpack-dev-server --config examples/webpack.config.js --mode development",
+    "build:examples": "yarn clean:examples && NODE_OPTIONS=--openssl-legacy-provider webpack --config examples/webpack.config.js",
+    "examples": "yarn clean:examples && NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --config examples/webpack.config.js --mode development",
     "lint": "eslint src test",
     "storybook": "start-storybook -p 9002",
     "test": "yarn lint && jest",
