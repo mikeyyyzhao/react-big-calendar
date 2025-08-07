@@ -79,22 +79,12 @@ class EventEndingRow extends React.Component {
     let count = eventsInSlot(segments, slot)
 
     return count ? (
-      <div
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-        onMouseUp={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
-      >
+      <div onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           key={'sm_' + slot}
           className={clsx('rbc-button-link', 'rbc-show-more')}
           onClick={(e) => this.showMore(slot, e)}
-          onMouseDown={(e) => e.stopPropagation()}
-          onMouseUp={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
         >
           {localizer.messages.showMore(count)}
         </button>
