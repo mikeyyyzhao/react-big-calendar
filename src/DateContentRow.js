@@ -1,6 +1,5 @@
 import clsx from 'clsx'
 import getHeight from 'dom-helpers/height'
-import qsa from 'dom-helpers/querySelectorAll'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { findDOMNode } from 'react-dom'
@@ -21,20 +20,16 @@ class DateContentRow extends React.Component {
 
   handleSelectSlot = (slot) => {
     const { range, onSelectSlot } = this.props
-
     onSelectSlot(range.slice(slot.start, slot.end + 1), slot)
   }
 
-  handleShowMore = (slot, target) => {
+  handleShowMore = (event, slot) => {
     const { range, onShowMore } = this.props
+    if (!onShowMore) return
+
     let metrics = this.slotMetrics(this.props)
-    let row = qsa(findDOMNode(this), '.rbc-row-bg')[0]
-
-    let cell
-    if (row) cell = row.children[slot - 1]
-
     let events = metrics.getEventsForSlot(slot)
-    onShowMore(events, range[slot - 1], cell, slot, target)
+    onShowMore(events, range[slot - 1], slot, event)
   }
 
   createHeadingRef = (r) => {
@@ -237,12 +232,11 @@ DateContentRow.propTypes = {
   localizer: PropTypes.object.isRequired,
 
   minRows: PropTypes.number.isRequired,
-  maxRows: PropTypes.number.isRequired,
+  maxRows: PropTypes.number,
 }
 
 DateContentRow.defaultProps = {
   minRows: 0,
-  maxRows: Infinity,
 }
 
 export default DateContentRow

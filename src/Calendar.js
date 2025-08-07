@@ -400,12 +400,24 @@ class Calendar extends React.Component {
     onShowMore: PropTypes.func,
 
     /**
+     * Callback fired when a +{count} more is clicked for all-day events.
+     * Only applies to week and work week views.
+     */
+    onShowMoreAllDay: PropTypes.func,
+
+    /**
      * Displays all events on the month view instead of
      * having some hidden behind +{count} more. This will
      * cause the rows in the month view to be scrollable if
      * the number of events exceed the height of the row.
      */
     showAllEvents: PropTypes.bool,
+
+    /**
+     * Maximum number of all-day event rows to display before showing "+X more".
+     * Only applies to week and work week views. Default is 3.
+     */
+    maxRows: PropTypes.number,
 
     /**
      * The selected event, if any.
@@ -1021,6 +1033,7 @@ class Calendar extends React.Component {
       length,
       showMultiDayTimes,
       onShowMore,
+      onShowMoreAllDay,
       doShowMoreDrillDown,
       components: _0,
       formats: _1,
@@ -1075,6 +1088,7 @@ class Calendar extends React.Component {
           onKeyPressEvent={this.handleKeyPressEvent}
           onSelectSlot={this.handleSelectSlot}
           onShowMore={onShowMore}
+          onShowMoreAllDay={onShowMoreAllDay}
           doShowMoreDrillDown={doShowMoreDrillDown}
         />
       </div>

@@ -115,6 +115,13 @@ export default class TimeGrid extends Component {
     }
   }
 
+  handleShowMoreAllDay = (events, date, slot, event) => {
+    const { onShowMoreAllDay } = this.props
+    if (onShowMoreAllDay) {
+      onShowMoreAllDay(events, date, slot, event)
+    }
+  }
+
   renderEvents(range, events, backgroundEvents, now) {
     let { min, max, components, accessors, localizer, dayLayoutAlgorithm } =
       this.props
@@ -250,7 +257,8 @@ export default class TimeGrid extends Component {
           onDoubleClickEvent={this.props.onDoubleClickEvent}
           onKeyPressEvent={this.props.onKeyPressEvent}
           onDrillDown={this.props.onDrillDown}
-          onShowMore={this.handleShowMore}
+          onShowMoreAllDay={this.handleShowMoreAllDay}
+          maxRows={this.props.maxRows}
           getDrilldownView={this.props.getDrilldownView}
           resizable={resizable}
         />
@@ -376,6 +384,8 @@ TimeGrid.propTypes = {
   onDoubleClickEvent: PropTypes.func,
   onKeyPressEvent: PropTypes.func,
   onShowMore: PropTypes.func,
+  onShowMoreAllDay: PropTypes.func,
+  maxRows: PropTypes.number,
   onDrillDown: PropTypes.func,
   getDrilldownView: PropTypes.func.isRequired,
 
