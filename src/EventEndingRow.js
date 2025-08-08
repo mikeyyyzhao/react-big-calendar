@@ -78,7 +78,6 @@ class EventEndingRow extends React.Component {
     let { localizer } = this.props
     let count = eventsInSlot(segments, slot)
 
-    // TODO: do we want to delete rbc-event?
     return count ? (
       <div
         type="button"
