@@ -78,16 +78,17 @@ class EventEndingRow extends React.Component {
     let { localizer } = this.props
     let count = eventsInSlot(segments, slot)
 
+    // TODO: do we want to delete rbc-event?
     return count ? (
-      <div onClick={(e) => e.stopPropagation()}>
-        <button
-          type="button"
-          key={'sm_' + slot}
-          className={clsx('rbc-button-link', 'rbc-show-more')}
-          onClick={(e) => this.showMore(slot, e)}
-        >
-          {localizer.messages.showMore(count)}
-        </button>
+      <div
+        type="button"
+        key={'sm_' + slot}
+        className={clsx('rbc-event', 'rbc-button-link', 'rbc-show-more')}
+        onClick={(e) => {
+          this.showMore(slot, e)
+        }}
+      >
+        {localizer.messages.showMore(count)}
       </div>
     ) : (
       false
@@ -95,10 +96,6 @@ class EventEndingRow extends React.Component {
   }
 
   showMore(slot, e) {
-    // Prevent event from bubbling up to parent components
-    e.preventDefault()
-    e.stopPropagation()
-
     if (this.props.onShowMore) {
       this.props.onShowMore(e, slot)
     }

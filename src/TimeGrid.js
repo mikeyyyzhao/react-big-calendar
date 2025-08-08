@@ -108,13 +108,6 @@ export default class TimeGrid extends Component {
     })
   }
 
-  handleShowMore = (events, date, slot, target) => {
-    const { onShowMore } = this.props
-    if (onShowMore) {
-      onShowMore(events, date, slot, target)
-    }
-  }
-
   handleShowMoreAllDay = (events, date, slot, event) => {
     const { onShowMoreAllDay } = this.props
     if (onShowMoreAllDay) {
