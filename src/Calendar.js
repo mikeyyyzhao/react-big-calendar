@@ -300,6 +300,15 @@ class Calendar extends React.Component {
     onView: PropTypes.func,
 
     /**
+     * Callback fired when calendar mounts
+     *
+     * ```js
+     * () => void
+     * ```
+     */
+    onMountCallback: PropTypes.func,
+
+    /**
      * Callback fired when date header, or the truncated events links are clicked
      *
      */
@@ -905,6 +914,14 @@ class Calendar extends React.Component {
       context: this.getContext(this.props),
     }
   }
+
+  componentDidMount() {
+    const { onMountCallback } = this.props
+    if (onMountCallback) {
+      onMountCallback()
+    }
+  }
+
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { context } = this.props
     if (context === nextProps.context) {
