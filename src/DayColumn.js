@@ -14,6 +14,7 @@ import TimeGridEvent from './TimeGridEvent'
 import { DayLayoutAlgorithmPropType } from './utils/propTypes'
 
 import DayColumnWrapper from './DayColumnWrapper'
+import { areObjectsEqual } from './utils/memoization'
 
 class DayColumn extends React.Component {
   state = { selecting: false, timeIndicatorPosition: null }
@@ -152,15 +153,12 @@ class DayColumn extends React.Component {
         )}
         slotMetrics={slotMetrics}
       >
-        {slotMetrics.groups.map((grp, idx) => (
-          <TimeSlotGroup
-            key={idx}
-            group={grp}
-            resource={resource}
-            getters={getters}
-            components={components}
-          />
-        ))}
+        <MemoizedSlotGroups
+          slotGroups={slotMetrics.groups}
+          resource={resource}
+          getters={getters}
+          components={components}
+        />
         <EventContainer
           localizer={localizer}
           resource={resource}
@@ -447,5 +445,36 @@ DayColumn.defaultProps = {
   dragThroughEvents: true,
   timeslots: 2,
 }
+
+function SlotGroups({ slotGroups, resource, getters, components }) {
+  return (
+    <>
+      {slotGroups.map((grp, idx) => (
+        <TimeSlotGroup
+          key={idx}
+          group={grp}
+          resource={resource}
+          getters={getters}
+          components={components}
+        />
+      ))}
+    </>
+  )
+}
+
+const MemoizedSlotGroups = React.memo(SlotGroups, (prevProps, nextProps) => {
+  for (const key in prevProps) {
+    if (['getters', 'components'].includes(key)) {
+      if (!areObjectsEqual(prevProps[key], nextProps[key])) {
+        return false
+      }
+    } else {
+      if (!Object.is(prevProps[key], nextProps[key])) {
+        return false
+      }
+    }
+  }
+  return true
+})
 
 export default DayColumn
