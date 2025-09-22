@@ -453,18 +453,9 @@ function SlotGroups({ slotGroups, resource, getters, components }) {
 }
 
 const MemoizedSlotGroups = React.memo(SlotGroups, (prevProps, nextProps) => {
-  for (const key in prevProps) {
-    if (['getters', 'components'].includes(key)) {
-      if (!areObjectsEqual(prevProps[key], nextProps[key])) {
-        return false
-      }
-    } else {
-      if (!Object.is(prevProps[key], nextProps[key])) {
-        return false
-      }
-    }
-  }
-  return true
+  return areObjectsEqual(prevProps, nextProps, {
+    comparators: { getters: areObjectsEqual, components: areObjectsEqual },
+  })
 })
 
 export default DayColumn
