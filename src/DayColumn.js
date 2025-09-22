@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { findDOMNode } from 'react-dom'
 import clsx from 'clsx'
 
@@ -17,8 +17,7 @@ import DayColumnWrapper from './DayColumnWrapper'
 import { areObjectsEqual } from './utils/memoization'
 
 class DayColumn extends React.Component {
-  state = { selecting: false, timeIndicatorPosition: null }
-  intervalTriggered = false
+  state = { selecting: false }
 
   constructor(...args) {
     super(...args)
@@ -28,15 +27,10 @@ class DayColumn extends React.Component {
 
   componentDidMount() {
     this.props.selectable && this._selectable()
-
-    if (this.props.isNow) {
-      this.setTimeIndicatorPositionUpdateInterval()
-    }
   }
 
   componentWillUnmount() {
     this._teardownSelectable()
-    this.clearTimeIndicatorInterval()
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -45,64 +39,6 @@ class DayColumn extends React.Component {
       this._teardownSelectable()
 
     this.slotMetrics = this.slotMetrics.update(nextProps)
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { getNow, isNow, localizer, date, min, max } = this.props
-    const getNowChanged = localizer.neq(prevProps.getNow(), getNow(), 'minutes')
-
-    if (prevProps.isNow !== isNow || getNowChanged) {
-      this.clearTimeIndicatorInterval()
-
-      if (isNow) {
-        const tail =
-          !getNowChanged &&
-          localizer.eq(prevProps.date, date, 'minutes') &&
-          prevState.timeIndicatorPosition === this.state.timeIndicatorPosition
-
-        this.setTimeIndicatorPositionUpdateInterval(tail)
-      }
-    } else if (
-      isNow &&
-      (localizer.neq(prevProps.min, min, 'minutes') ||
-        localizer.neq(prevProps.max, max, 'minutes'))
-    ) {
-      this.positionTimeIndicator()
-    }
-  }
-
-  /**
-   * @param tail {Boolean} - whether `positionTimeIndicator` call should be
-   *   deferred or called upon setting interval (`true` - if deferred);
-   */
-  setTimeIndicatorPositionUpdateInterval(tail = false) {
-    if (!this.intervalTriggered && !tail) {
-      this.positionTimeIndicator()
-    }
-
-    this._timeIndicatorTimeout = window.setTimeout(() => {
-      this.intervalTriggered = true
-      this.positionTimeIndicator()
-      this.setTimeIndicatorPositionUpdateInterval()
-    }, 60000)
-  }
-
-  clearTimeIndicatorInterval() {
-    this.intervalTriggered = false
-    window.clearTimeout(this._timeIndicatorTimeout)
-  }
-
-  positionTimeIndicator() {
-    const { min, max, getNow } = this.props
-    const current = getNow()
-
-    if (current >= min && current <= max) {
-      const top = this.slotMetrics.getCurrentTimePosition(current)
-      this.intervalTriggered = true
-      this.setState({ timeIndicatorPosition: top })
-    } else {
-      this.clearTimeIndicatorInterval()
-    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -181,12 +117,13 @@ class DayColumn extends React.Component {
             <span>{localizer.format(selectDates, 'selectRangeFormat')}</span>
           </div>
         )}
-        {isNow && this.intervalTriggered && (
-          <div
-            className="rbc-current-time-indicator"
-            style={{ top: `${this.state.timeIndicatorPosition}%` }}
-          />
-        )}
+        <TimeIndicator
+          getNow={this.props.getNow}
+          isNow={isNow}
+          min={this.props.min}
+          max={this.props.max}
+          slotMetrics={slotMetrics}
+        />
       </DayColumnWrapperComponent>
     )
   }
@@ -444,6 +381,59 @@ DayColumn.propTypes = {
 DayColumn.defaultProps = {
   dragThroughEvents: true,
   timeslots: 2,
+}
+
+/**
+ * @param {Object} props
+ * @param {() => Date} props.getNow
+ * @param {boolean=} props.isNow
+ * @param {Date} props.max
+ * @param {Date} props.min
+ * @param {Object} props.slotMetrics
+ */
+function TimeIndicator({ getNow, isNow, max, min, slotMetrics }) {
+  const [position, setPosition] = useState(0)
+
+  const isTimeoutRunning = (() => {
+    if (!isNow) {
+      return false
+    }
+
+    const current = getNow()
+    return current >= min && current <= max
+  })()
+
+  useEffect(() => {
+    if (!isTimeoutRunning) {
+      return
+    }
+
+    const recalculatePosition = () => {
+      const current = getNow()
+      const top = slotMetrics.getCurrentTimePosition(current)
+      setPosition(top)
+    }
+
+    recalculatePosition()
+    const interval = window.setInterval(() => {
+      recalculatePosition()
+    }, 60000)
+
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [getNow, isTimeoutRunning, slotMetrics])
+
+  if (!isTimeoutRunning) {
+    return null
+  }
+
+  return (
+    <div
+      className="rbc-current-time-indicator"
+      style={{ top: `${position}%` }}
+    />
+  )
 }
 
 function SlotGroups({ slotGroups, resource, getters, components }) {
