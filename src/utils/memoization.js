@@ -145,6 +145,10 @@ export function compareLists(listA, listB, comparator = Object.is) {
     return true
   }
 
+  if (!listA || !listB) {
+    return false
+  }
+
   if (listA.length !== listB.length) {
     return false
   }
@@ -178,6 +182,10 @@ export function compareUnorderedLists(
 ) {
   if (listA === listB) {
     return true
+  }
+
+  if (!listA || !listB) {
+    return false
   }
 
   if (listA.length !== listB.length) {
@@ -236,6 +244,10 @@ export function compareObjects(
 ) {
   if (objectA === objectB) {
     return true
+  }
+
+  if (!objectA || !objectB) {
+    return false
   }
 
   // If the number of checked keys has changed, we don't need to check any of the values.
