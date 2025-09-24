@@ -5,7 +5,7 @@ import {
 } from '../../src/utils/memoization'
 
 describe('compareLists', () => {
-  test('it returns true if the lists are idential', () => {
+  test('it returns true if the lists are identical', () => {
     const list = ['foo', 'bar']
     expect(compareLists(list, list)).toBe(true)
   })
@@ -46,7 +46,7 @@ describe('compareLists', () => {
 })
 
 describe('compareUnorderedLists', () => {
-  test('it returns true if the lists are idential', () => {
+  test('it returns true if the lists are identical', () => {
     const list = ['foo', 'bar']
     expect(compareUnorderedLists(list, list)).toBe(true)
   })
