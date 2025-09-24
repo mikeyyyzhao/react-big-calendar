@@ -42,8 +42,8 @@
   },
   "peerDependencies": {
     "moment": "^2.29.1",
-    "react": "^16.4.0 || ^17 || ^18",
-    "react-dom": "^16.4.0 || ^17 || ^18"
+    "react": "^16.4.1 || ^17 || ^18",
+    "react-dom": "^16.4.1 || ^17 || ^18"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
