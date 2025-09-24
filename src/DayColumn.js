@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { findDOMNode } from 'react-dom'
 import clsx from 'clsx'
 
@@ -392,7 +392,12 @@ DayColumn.defaultProps = {
  * @param {Object} props.slotMetrics
  */
 function TimeIndicator({ getNow, isNow, max, min, slotMetrics }) {
-  const [position, setPosition] = useState(0)
+  const recalculatePosition = useCallback(() => {
+    const current = getNow()
+    return slotMetrics.getCurrentTimePosition(current)
+  }, [getNow, slotMetrics])
+
+  const [position, setPosition] = useState(recalculatePosition)
 
   const isTimeoutRunning = (() => {
     if (!isNow) {
@@ -408,21 +413,19 @@ function TimeIndicator({ getNow, isNow, max, min, slotMetrics }) {
       return
     }
 
-    const recalculatePosition = () => {
-      const current = getNow()
-      const top = slotMetrics.getCurrentTimePosition(current)
-      setPosition(top)
+    const updatePosition = () => {
+      setPosition(recalculatePosition())
     }
 
-    recalculatePosition()
+    updatePosition()
     const interval = window.setInterval(() => {
-      recalculatePosition()
+      updatePosition()
     }, 60000)
 
     return () => {
       window.clearInterval(interval)
     }
-  }, [getNow, isTimeoutRunning, slotMetrics])
+  }, [isTimeoutRunning, recalculatePosition])
 
   if (!isTimeoutRunning) {
     return null
