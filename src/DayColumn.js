@@ -14,7 +14,7 @@ import TimeGridEvent from './TimeGridEvent'
 import { DayLayoutAlgorithmPropType } from './utils/propTypes'
 
 import DayColumnWrapper from './DayColumnWrapper'
-import { compareObjects } from './utils/memoization'
+import { compareObjects, DEBUG_MEMOIZATION } from './utils/memoization'
 
 class DayColumn extends React.Component {
   state = { selecting: false }
@@ -455,6 +455,8 @@ function SlotGroups({ slotGroups, resource, getters, components }) {
 const MemoizedSlotGroups = React.memo(SlotGroups, (prevProps, nextProps) => {
   return compareObjects(prevProps, nextProps, {
     comparators: { getters: compareObjects, components: compareObjects },
+    logDifferences: DEBUG_MEMOIZATION,
+    from: 'DayColumn',
   })
 })
 
