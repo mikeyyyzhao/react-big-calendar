@@ -23,4 +23,4 @@ jobs:
         run: yarn test
 
       - name: Build
-        run: yarn build --legacy-peer-deps
+        run: yarn build
