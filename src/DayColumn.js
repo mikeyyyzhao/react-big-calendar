@@ -14,7 +14,7 @@ import TimeGridEvent from './TimeGridEvent'
 import { DayLayoutAlgorithmPropType } from './utils/propTypes'
 
 import DayColumnWrapper from './DayColumnWrapper'
-import { areObjectsEqual } from './utils/memoization'
+import { compareObjects } from './utils/memoization'
 
 class DayColumn extends React.Component {
   state = { selecting: false }
@@ -453,8 +453,8 @@ function SlotGroups({ slotGroups, resource, getters, components }) {
 }
 
 const MemoizedSlotGroups = React.memo(SlotGroups, (prevProps, nextProps) => {
-  return areObjectsEqual(prevProps, nextProps, {
-    comparators: { getters: areObjectsEqual, components: areObjectsEqual },
+  return compareObjects(prevProps, nextProps, {
+    comparators: { getters: compareObjects, components: compareObjects },
   })
 })
 

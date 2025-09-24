@@ -20,7 +20,7 @@ function findMatchingEvent(event, events) {
  * @param {Object} nextevent
  */
 export function compareEvents(prevEvent, nextEvent) {
-  return areObjectsEqual(prevEvent, nextEvent, {
+  return compareObjects(prevEvent, nextEvent, {
     comparators: {
       mergedEvents: compareEventLists,
     },
@@ -61,7 +61,7 @@ function compareEventLists(prevEvents, nextEvents) {
  * @param {(keyof T)[]=} options.ignoredKeys
  *   these keys will be ignored when comparing objects
  */
-export function areObjectsEqual(
+export function compareObjects(
   objectA,
   objectB,
   { comparators = {}, defaultComparator = Object.is, ignoredKeys = [] } = {}
