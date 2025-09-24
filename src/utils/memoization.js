@@ -141,25 +141,29 @@ function compareEventLists(prevEvents, nextEvents) {
  * @param {(itemA: T, itemB: T) => boolean} comparator
  */
 export function compareLists(listA, listB, comparator = Object.is) {
-  if (listA === listB) {
-    return true
-  }
+  try {
+    if (listA === listB) {
+      return true
+    }
 
-  if (!listA || !listB) {
-    return false
-  }
-
-  if (listA.length !== listB.length) {
-    return false
-  }
-
-  for (let i = 0; i < listA.length; i++) {
-    if (!comparator(listA[i], listB[i])) {
+    if (!listA || !listB) {
       return false
     }
-  }
 
-  return true
+    if (listA.length !== listB.length) {
+      return false
+    }
+
+    for (let i = 0; i < listA.length; i++) {
+      if (!comparator(listA[i], listB[i])) {
+        return false
+      }
+    }
+
+    return true
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -180,36 +184,40 @@ export function compareUnorderedLists(
   matcher = Object.is,
   comparator = Object.is
 ) {
-  if (listA === listB) {
+  try {
+    if (listA === listB) {
+      return true
+    }
+
+    if (!listA || !listB) {
+      return false
+    }
+
+    if (listA.length !== listB.length) {
+      return false
+    }
+
+    const matchedIndexes = new Set()
+    for (const itemA of listA) {
+      const indexB = listB.findIndex(
+        (item, index) => !matchedIndexes.has(index) && matcher(itemA, item)
+      )
+      if (indexB === -1) {
+        return false
+      }
+
+      matchedIndexes.add(indexB)
+      const itemB = listB[indexB]
+
+      if (!comparator(itemA, itemB)) {
+        return false
+      }
+    }
+
     return true
-  }
-
-  if (!listA || !listB) {
+  } catch {
     return false
   }
-
-  if (listA.length !== listB.length) {
-    return false
-  }
-
-  const matchedIndexes = new Set()
-  for (const itemA of listA) {
-    const indexB = listB.findIndex(
-      (item, index) => !matchedIndexes.has(index) && matcher(itemA, item)
-    )
-    if (indexB === -1) {
-      return false
-    }
-
-    matchedIndexes.add(indexB)
-    const itemB = listB[indexB]
-
-    if (!comparator(itemA, itemB)) {
-      return false
-    }
-  }
-
-  return true
 }
 
 /**
@@ -242,60 +250,67 @@ export function compareObjects(
     from,
   } = {}
 ) {
-  if (objectA === objectB) {
+  try {
+    if (objectA === objectB) {
+      return true
+    }
+
+    if (!objectA || !objectB) {
+      return false
+    }
+
+    // If the number of checked keys has changed, we don't need to check any of the values.
+    const ignoredKeysSet = new Set(ignoredKeys)
+    const keysToCheckA = Object.keys(objectA).filter(
+      (key) => !ignoredKeysSet.has(key)
+    )
+    const keysToCheckB = Object.keys(objectB).filter(
+      (key) => !ignoredKeysSet.has(key)
+    )
+    if (keysToCheckA.length !== keysToCheckB.length) {
+      if (logDifferences) {
+        console.info((from ? `[${from}] ` : '') + 'different object sizes')
+      }
+      return false
+    }
+
+    // If the number of checked keys is the same, we should check to make sure
+    // the two lists of keys are the same.
+    const checkedKeys = new Set()
+    for (const key of keysToCheckA) {
+      checkedKeys.add(key)
+    }
+
+    for (const key of keysToCheckB) {
+      if (!checkedKeys.has(key)) {
+        if (logDifferences) {
+          console.info((from ? `[${from}] ` : '') + 'missing key:' + key)
+        }
+        return false
+      }
+    }
+
+    // If the number of checked keys is the same, we should check to make sure
+    // the two lists of keys are the same.
+    for (const key of checkedKeys) {
+      const comparator = comparators[key] ?? defaultComparator
+      if (!comparator(objectA[key], objectB[key])) {
+        if (logDifferences) {
+          console.info(
+            (from ? `[${from}] ` : '') + 'different values for key:',
+            {
+              key,
+              valueA: objectA[key],
+              valueB: objectB[key],
+            }
+          )
+        }
+        return false
+      }
+    }
+
     return true
-  }
-
-  if (!objectA || !objectB) {
+  } catch {
     return false
   }
-
-  // If the number of checked keys has changed, we don't need to check any of the values.
-  const ignoredKeysSet = new Set(ignoredKeys)
-  const keysToCheckA = Object.keys(objectA).filter(
-    (key) => !ignoredKeysSet.has(key)
-  )
-  const keysToCheckB = Object.keys(objectB).filter(
-    (key) => !ignoredKeysSet.has(key)
-  )
-  if (keysToCheckA.length !== keysToCheckB.length) {
-    if (logDifferences) {
-      console.info((from ? `[${from}] ` : '') + 'different object sizes')
-    }
-    return false
-  }
-
-  // If the number of checked keys is the same, we should check to make sure
-  // the two lists of keys are the same.
-  const checkedKeys = new Set()
-  for (const key of keysToCheckA) {
-    checkedKeys.add(key)
-  }
-
-  for (const key of keysToCheckB) {
-    if (!checkedKeys.has(key)) {
-      if (logDifferences) {
-        console.info((from ? `[${from}] ` : '') + 'missing key:' + key)
-      }
-      return false
-    }
-  }
-
-  // If the number of checked keys is the same, we should check to make sure
-  // the two lists of keys are the same.
-  for (const key of checkedKeys) {
-    const comparator = comparators[key] ?? defaultComparator
-    if (!comparator(objectA[key], objectB[key])) {
-      if (logDifferences) {
-        console.info((from ? `[${from}] ` : '') + 'different values for key:', {
-          key,
-          valueA: objectA[key],
-          valueB: objectB[key],
-        })
-      }
-      return false
-    }
-  }
-
-  return true
 }
