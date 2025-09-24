@@ -1,4 +1,52 @@
 /**
+ * Find a matching event in a list by the event's user_event_id if it exists.
+ * Otherwise search by the event's id.
+ * @param {Object} event the event to find
+ * @param {Object[]} events the list of events to search
+ */
+function findMatchingEvent(event, events) {
+  if (event.user_event_id) {
+    return events.find((e) => e.user_event_id === event.user_event_id)
+  }
+
+  if (event.id) {
+    return events.find((e) => e.id === event.id)
+  }
+}
+
+/**
+ * Our custom event comparator.
+ * @param {Object} prevEvent
+ * @param {Object} nextevent
+ */
+export function compareEvents(prevEvent, nextEvent) {
+  return areObjectsEqual(prevEvent, nextEvent, {
+    comparators: {
+      mergedEvents: compareEventLists,
+    },
+  })
+}
+
+/**
+ * Checks if two lists events have the same events in the array, regardless of order.
+ * When comparing events, we use our custom event comparator.
+ */
+function compareEventLists(prevEvents, nextEvents) {
+  if (prevEvents.length !== nextEvents.length) {
+    return false
+  }
+
+  for (const prevEvent of prevEvents) {
+    const nextEvent = findMatchingEvent(prevEvent, nextEvents)
+    if (!nextEvent || !compareEvents(prevEvent, nextEvent)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
  * @template [T=Record<string, unknown>]
  * @param {T} objectA
  * @param {T} objectB

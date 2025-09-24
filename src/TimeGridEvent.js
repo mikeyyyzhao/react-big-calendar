@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React from 'react'
+import { compareEvents, areObjectsEqual } from './utils/memoization'
 
 function stringifyPercent(v) {
   return typeof v === 'string' ? v : v + '%'
@@ -87,4 +88,16 @@ function TimeGridEvent(props) {
   )
 }
 
-export default TimeGridEvent
+const MemoizedTimeGridEvent = React.memo(
+  TimeGridEvent,
+  (prevProps, nextProps) => {
+    return areObjectsEqual(prevProps, nextProps, {
+      comparators: {
+        style: areObjectsEqual,
+        event: compareEvents,
+      },
+    })
+  }
+)
+
+export default MemoizedTimeGridEvent
