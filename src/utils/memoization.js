@@ -75,7 +75,7 @@ export function compareObjects(
   const keysToCheckA = Object.keys(objectA).filter(
     (key) => !ignoredKeysSet.has(key)
   )
-  const keysToCheckB = Object.keys(objectA).filter(
+  const keysToCheckB = Object.keys(objectB).filter(
     (key) => !ignoredKeysSet.has(key)
   )
   if (keysToCheckA.length !== keysToCheckB.length) {
@@ -97,12 +97,12 @@ export function compareObjects(
 
   // If the number of checked keys is the same, we should check to make sure
   // the two lists of keys are the same.
-  checkedKeys.forEach((key) => {
+  for (const key of checkedKeys) {
     const comparator = comparators[key] ?? defaultComparator
     if (!comparator(objectA[key], objectB[key])) {
       return false
     }
-  })
+  }
 
   return true
 }
