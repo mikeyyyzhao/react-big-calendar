@@ -1,5 +1,10 @@
 import clsx from 'clsx'
 import React from 'react'
+import {
+  compareEvents,
+  compareObjects,
+  DEBUG_MEMOIZATION,
+} from './utils/memoization'
 
 function stringifyPercent(v) {
   return typeof v === 'string' ? v : v + '%'
@@ -87,4 +92,20 @@ function TimeGridEvent(props) {
   )
 }
 
-export default TimeGridEvent
+const MemoizedTimeGridEvent = React.memo(
+  TimeGridEvent,
+  (prevProps, nextProps) => {
+    return compareObjects(prevProps, nextProps, {
+      comparators: {
+        style: compareObjects,
+        event: compareEvents,
+      },
+      // TODO: These keys currently change every render. Check to see if we can prevent that so we can check them.
+      ignoredKeys: ['onClick', 'onDoubleClick', 'onKeyPress'],
+      logDifferences: DEBUG_MEMOIZATION,
+      from: 'TimeGridEvent',
+    })
+  }
+)
+
+export default MemoizedTimeGridEvent

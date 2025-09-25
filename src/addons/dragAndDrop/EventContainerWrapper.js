@@ -258,6 +258,10 @@ class EventContainerWrapper extends React.Component {
               accessors={{ ...accessors, ...dragAccessors }}
               continuesPrior={startsBeforeDay}
               continuesAfter={startsAfterDay}
+              isVimcalSelected={
+                this.props.selectedUserEventID === event.user_event_id
+              }
+              eventRefreshKey={this.props.eventRefreshKey}
             />
           )}
         </React.Fragment>
