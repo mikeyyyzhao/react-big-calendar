@@ -1,7 +1,6 @@
 import * as dates from 'date-arithmetic'
 
-// TODO: Set this to false.
-export const DEBUG_MEMOIZATION = true
+export const DEBUG_MEMOIZATION = false
 
 /**
  * Our custom event comparator.
