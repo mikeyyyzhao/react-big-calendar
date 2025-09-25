@@ -146,6 +146,8 @@ export function compareLists(listA, listB, comparator = Object.is) {
     }
 
     if (!listA || !listB) {
+      // We already know both lists aren't equal, so even if both lists are
+      // falsey we know the falsey values are different.
       return false
     }
 
@@ -189,6 +191,8 @@ export function compareUnorderedLists(
     }
 
     if (!listA || !listB) {
+      // We already know both lists aren't equal, so even if both lists are
+      // falsey we know the falsey values are different.
       return false
     }
 
@@ -255,6 +259,8 @@ export function compareObjects(
     }
 
     if (!objectA || !objectB) {
+      // We already know both objects aren't equal, so even if both objects are
+      // falsey we know the falsey values are different.
       return false
     }
 
