@@ -61,6 +61,7 @@ class DayColumn extends React.Component {
       resource,
       accessors,
       localizer,
+      slotGroupRefreshKey,
       getters: { dayProp, ...getters },
       components: { eventContainerWrapper: EventContainer, ...components },
     } = this.props
@@ -94,6 +95,7 @@ class DayColumn extends React.Component {
           resource={resource}
           getters={getters}
           components={components}
+          slotGroupRefreshKey={slotGroupRefreshKey}
         />
         <EventContainer
           localizer={localizer}
@@ -443,17 +445,11 @@ function TimeIndicator({ getNow, isNow, max, min, slotMetrics }) {
   )
 }
 
-function SlotGroups({ slotGroups, resource, getters, components }) {
+function SlotGroups({ slotGroups, ...props }) {
   return (
     <>
       {slotGroups.map((grp, idx) => (
-        <TimeSlotGroup
-          key={idx}
-          group={grp}
-          resource={resource}
-          getters={getters}
-          components={components}
-        />
+        <TimeSlotGroup key={idx} group={grp} {...props} />
       ))}
     </>
   )
