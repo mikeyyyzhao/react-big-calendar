@@ -6,9 +6,11 @@ function getMaxIdxDFS(node, maxIdx, visited) {
     if (visited.indexOf(node.friends[i]) > -1) continue
     const friend = node.friends[i]
 
-    // Skip hidden events when calculating max index
+    // Skip hidden events when calculating max index, but still traverse their friends
     if (isHiddenEvent(friend?.event)) {
       visited.push(friend)
+      const newIdx = getMaxIdxDFS(friend, maxIdx, visited)
+      maxIdx = maxIdx > newIdx ? maxIdx : newIdx
       continue
     }
 
@@ -109,8 +111,7 @@ export default function ({
     // Check if there are any hidden events in this friend group
     const hasHiddenInGroup =
       allFriends.some((f) => isHiddenEvent(f?.event)) ||
-      styledEvents[i].friends.some((f) => isHiddenEvent(f?.event)) ||
-      isHiddenEvent(styledEvents[i]?.event)
+      styledEvents[i].friends.some((f) => isHiddenEvent(f?.event))
 
     // Calculate size as percentage of container
     // For groups with hidden events, the 10px offset is handled in CSS calc()
