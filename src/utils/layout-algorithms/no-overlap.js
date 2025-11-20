@@ -1,17 +1,27 @@
+import { isHiddenEvent } from '../helpers'
 import overlap from './overlap'
 
 function getMaxIdxDFS(node, maxIdx, visited) {
   for (let i = 0; i < node.friends.length; ++i) {
     if (visited.indexOf(node.friends[i]) > -1) continue
-    maxIdx = maxIdx > node.friends[i].idx ? maxIdx : node.friends[i].idx
+    const friend = node.friends[i]
+
+    // Skip hidden events when calculating max index
+    if (isHiddenEvent(friend?.event)) {
+      visited.push(friend)
+      continue
+    }
+
+    maxIdx = maxIdx > friend.idx ? maxIdx : friend.idx
     // TODO : trace it by not object but kinda index or something for performance
-    visited.push(node.friends[i])
-    const newIdx = getMaxIdxDFS(node.friends[i], maxIdx, visited)
+    visited.push(friend)
+    const newIdx = getMaxIdxDFS(friend, maxIdx, visited)
     maxIdx = maxIdx > newIdx ? maxIdx : newIdx
   }
   return maxIdx
 }
 
+// hidden events are 10px wide
 export default function ({
   events,
   minimumStartDifference,
@@ -61,11 +71,23 @@ export default function ({
 
   for (let i = 0; i < styledEvents.length; ++i) {
     const se = styledEvents[i]
+
+    // Hidden events always get idx 0
+    if (isHiddenEvent(se?.event)) {
+      se.idx = 0
+      continue
+    }
+
     const bitmap = []
     for (let j = 0; j < 100; ++j) bitmap.push(1) // 1 means available
 
+    // Only consider visible friends when assigning indices
     for (let j = 0; j < se.friends.length; ++j)
-      if (se.friends[j].idx !== undefined) bitmap[se.friends[j].idx] = 0 // 0 means reserved
+      if (
+        !isHiddenEvent(se.friends[j]?.event) &&
+        se.friends[j].idx !== undefined
+      )
+        bitmap[se.friends[j].idx] = 0 // 0 means reserved
 
     se.idx = bitmap.indexOf(1)
   }
@@ -75,33 +97,77 @@ export default function ({
 
     if (styledEvents[i].size) continue
 
+    // Skip size calculation for hidden events (they're always 10px)
+    if (isHiddenEvent(styledEvents[i]?.event)) {
+      styledEvents[i].size = 0
+      continue
+    }
+
     const allFriends = []
     const maxIdx = getMaxIdxDFS(styledEvents[i], 0, allFriends)
-    size = 100 / (maxIdx + 1)
-    styledEvents[i].size = size
 
-    for (let j = 0; j < allFriends.length; ++j) allFriends[j].size = size
+    // Check if there are any hidden events in this friend group
+    const hasHiddenInGroup =
+      allFriends.some((f) => isHiddenEvent(f?.event)) ||
+      styledEvents[i].friends.some((f) => isHiddenEvent(f?.event))
+
+    // If hidden events exist, reserve 10px; otherwise use full width
+    if (hasHiddenInGroup) {
+      size = (100 - 10) / (maxIdx + 1) // Divide remaining 90% among visible events
+    } else {
+      size = 100 / (maxIdx + 1)
+    }
+
+    styledEvents[i].size = size
+    styledEvents[i].hasHiddenInGroup = hasHiddenInGroup
+
+    for (let j = 0; j < allFriends.length; ++j) {
+      if (!isHiddenEvent(allFriends[j]?.event)) {
+        allFriends[j].size = size
+        allFriends[j].hasHiddenInGroup = hasHiddenInGroup
+      }
+    }
   }
 
   for (let i = 0; i < styledEvents.length; ++i) {
     const e = styledEvents[i]
+
+    // Handle hidden events separately
+    if (isHiddenEvent(e?.event)) {
+      e.style.left = 0
+      e.style.width = '10px'
+      e.style.height = `calc(${e.style.height}% - 2px)`
+      e.style.xOffset = '0px'
+      continue
+    }
+
+    // Calculate left position as percentage (within available space)
     e.style.left = e.idx * e.size
 
-    // stretch to maximum
+    // stretch to maximum (only consider visible friends)
     let maxIdx = 0
     for (let j = 0; j < e.friends.length; ++j) {
-      const idx = e.friends[j].idx
-      maxIdx = maxIdx > idx ? maxIdx : idx
+      if (!isHiddenEvent(e.friends[j]?.event)) {
+        const idx = e.friends[j].idx
+        maxIdx = maxIdx > idx ? maxIdx : idx
+      }
     }
-    if (maxIdx <= e.idx) e.size = 100 - e.idx * e.size
+
+    if (maxIdx <= e.idx) {
+      e.size = 100 - e.idx * e.size
+    }
 
     // padding between events
     // for this feature, `width` is not percentage based unit anymore
     // it will be used with calc()
     const padding = e.idx === 0 ? 0 : 3
     e.style.width = `calc(${e.size}% - ${padding}px)`
+
     e.style.height = `calc(${e.style.height}% - 2px)`
-    e.style.xOffset = `calc(${e.style.left}% + ${padding}px)`
+
+    // If there's a hidden event in the group, offset by 10px
+    const offsetPx = e.hasHiddenInGroup ? 10 : 0
+    e.style.xOffset = `calc(${offsetPx}px + ${e.style.left}% + ${padding}px)`
   }
 
   return styledEvents

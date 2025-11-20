@@ -34,7 +34,7 @@ export function hasStateOrPropsChanged(
   let stateKeys = newState ? Object.keys(newState) : []
   let propKeys = newProps ? Object.keys(newProps) : []
 
-  let hasStateChanged = stateKeys.some(k => {
+  let hasStateChanged = stateKeys.some((k) => {
     if (oldState[k] !== newState[k] && !excludedKeys.includes(k)) {
       if (isValidJSDate(newState[k]) && isValidJSDate(oldState[k])) {
         return !isSameMinute(newState[k], oldState[k])
@@ -59,7 +59,7 @@ export function hasStateOrPropsChanged(
     return true
   }
 
-  let hasPropsChanged = propKeys.some(k => {
+  let hasPropsChanged = propKeys.some((k) => {
     if (oldProps[k] !== newProps[k] && !excludedKeys.includes(k)) {
       if (isValidJSDate(newProps[k]) && isValidJSDate(oldProps[k])) {
         return !isSameMinute(newProps[k], oldProps[k])
@@ -97,4 +97,12 @@ export function useTraceUpdate(props) {
     }
     prev.current = props
   })
+}
+
+export function isHiddenEvent(event) {
+  try {
+    return event?.is_hidden || event?.is_recurring_event_hidden
+  } catch (_error) {
+    return false
+  }
 }
