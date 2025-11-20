@@ -161,7 +161,12 @@ export default function ({
     // for this feature, `width` is not percentage based unit anymore
     // it will be used with calc()
     const padding = e.idx === 0 ? 0 : 3
-    e.style.width = `calc(${e.size}% - ${padding}px)`
+    // Account for container's margin-right when there are hidden events
+    if (e.hasHiddenInGroup) {
+      e.style.width = `calc(${e.size}% - ${padding}px - 10px)`
+    } else {
+      e.style.width = `calc(${e.size}% - ${padding}px)`
+    }
 
     e.style.height = `calc(${e.style.height}% - 2px)`
 
