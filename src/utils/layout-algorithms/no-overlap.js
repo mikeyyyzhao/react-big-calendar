@@ -109,14 +109,12 @@ export default function ({
     // Check if there are any hidden events in this friend group
     const hasHiddenInGroup =
       allFriends.some((f) => isHiddenEvent(f?.event)) ||
-      styledEvents[i].friends.some((f) => isHiddenEvent(f?.event))
+      styledEvents[i].friends.some((f) => isHiddenEvent(f?.event)) ||
+      isHiddenEvent(styledEvents[i]?.event)
 
-    // If hidden events exist, reserve 10px; otherwise use full width
-    if (hasHiddenInGroup) {
-      size = (100 - 10) / (maxIdx + 1) // Divide remaining 90% among visible events
-    } else {
-      size = 100 / (maxIdx + 1)
-    }
+    // Calculate size as percentage of container
+    // For groups with hidden events, the 10px offset is handled in CSS calc()
+    size = 100 / (maxIdx + 1)
 
     styledEvents[i].size = size
     styledEvents[i].hasHiddenInGroup = hasHiddenInGroup
@@ -161,18 +159,20 @@ export default function ({
     // for this feature, `width` is not percentage based unit anymore
     // it will be used with calc()
     const padding = e.idx === 0 ? 0 : 3
-    // Account for container's margin-right when there are hidden events
+
     if (e.hasHiddenInGroup) {
-      e.style.width = `calc(${e.size}% - ${padding}px - 10px)`
+      // Visible events share (100% - 10px) of space
+      // Each event gets (size/100) * (100% - 10px) width
+      const sizeFraction = e.size / 100
+      const leftFraction = e.style.left / 100
+      e.style.width = `calc((100% - 10px) * ${sizeFraction} - ${padding}px)`
+      e.style.xOffset = `calc(10px + (100% - 10px) * ${leftFraction} + ${padding}px)`
     } else {
       e.style.width = `calc(${e.size}% - ${padding}px)`
+      e.style.xOffset = `calc(${e.style.left}% + ${padding}px)`
     }
 
     e.style.height = `calc(${e.style.height}% - 2px)`
-
-    // If there's a hidden event in the group, offset by 10px
-    const offsetPx = e.hasHiddenInGroup ? 10 : 0
-    e.style.xOffset = `calc(${offsetPx}px + ${e.style.left}% + ${padding}px)`
   }
 
   return styledEvents
