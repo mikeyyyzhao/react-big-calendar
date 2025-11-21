@@ -131,6 +131,7 @@ export default function ({
 
     // Handle hidden events separately
     if (isHiddenEvent(e?.event)) {
+      e.style.left = 0
       e.style.width = HIDDEN_EVENT_WIDTH
       e.style.height = `calc(${e.style.height}% - 2px)`
       e.style.xOffset = '0px'
