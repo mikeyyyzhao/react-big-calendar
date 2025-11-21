@@ -1,8 +1,9 @@
 import sortBy from 'lodash/sortBy'
 import { mergeRanges } from '../rangeFunctions'
 import _ from 'lodash'
+import { isHiddenEvent } from '../helpers'
 
-const HIDDEN_EVENT_WIDTH = '10px'
+export const HIDDEN_EVENT_WIDTH = '10px'
 
 /**
  * @typedef {{ start: number, end: number }} Range
@@ -404,7 +405,7 @@ export class Event {
   }
 
   get isHiddenEvent() {
-    return this.data?.is_hidden || this.data?.is_recurring_event_hidden
+    return isHiddenEvent(this.data)
   }
 
   /**
