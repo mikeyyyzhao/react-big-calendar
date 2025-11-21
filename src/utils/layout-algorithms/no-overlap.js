@@ -1,5 +1,5 @@
 import { isHiddenEvent } from '../helpers'
-import overlap from './overlap'
+import overlap, { HIDDEN_EVENT_WIDTH } from './overlap'
 
 function getMaxIdxDFS(node, maxIdx, visited) {
   for (let i = 0; i < node.friends.length; ++i) {
@@ -23,7 +23,6 @@ function getMaxIdxDFS(node, maxIdx, visited) {
   return maxIdx
 }
 
-// hidden events are 10px wide
 export default function ({
   events,
   minimumStartDifference,
@@ -99,7 +98,7 @@ export default function ({
 
     if (styledEvents[i].size) continue
 
-    // Skip size calculation for hidden events (they're always 10px)
+    // Skip size calculation for hidden events
     if (isHiddenEvent(styledEvents[i]?.event)) {
       styledEvents[i].size = 0
       continue
@@ -114,7 +113,6 @@ export default function ({
       styledEvents[i].friends.some((f) => isHiddenEvent(f?.event))
 
     // Calculate size as percentage of container
-    // For groups with hidden events, the 10px offset is handled in CSS calc()
     size = 100 / (maxIdx + 1)
 
     styledEvents[i].size = size
@@ -133,8 +131,7 @@ export default function ({
 
     // Handle hidden events separately
     if (isHiddenEvent(e?.event)) {
-      e.style.left = 0
-      e.style.width = '10px'
+      e.style.width = HIDDEN_EVENT_WIDTH
       e.style.height = `calc(${e.style.height}% - 2px)`
       e.style.xOffset = '0px'
       continue
@@ -162,12 +159,12 @@ export default function ({
     const padding = e.idx === 0 ? 0 : 3
 
     if (e.hasHiddenInGroup) {
-      // Visible events share (100% - 10px) of space
-      // Each event gets (size/100) * (100% - 10px) width
+      // Visible events share (100% - HIDDEN_EVENT_WIDTH) of space
+      // Each event gets (size/100) * (100% - HIDDEN_EVENT_WIDTH) width
       const sizeFraction = e.size / 100
       const leftFraction = e.style.left / 100
-      e.style.width = `calc((100% - 10px) * ${sizeFraction} - ${padding}px)`
-      e.style.xOffset = `calc(10px + (100% - 10px) * ${leftFraction} + ${padding}px)`
+      e.style.width = `calc((100% - ${HIDDEN_EVENT_WIDTH}) * ${sizeFraction} - ${padding}px)`
+      e.style.xOffset = `calc(${HIDDEN_EVENT_WIDTH} + (100% - ${HIDDEN_EVENT_WIDTH}) * ${leftFraction} + ${padding}px)`
     } else {
       e.style.width = `calc(${e.size}% - ${padding}px)`
       e.style.xOffset = `calc(${e.style.left}% + ${padding}px)`
