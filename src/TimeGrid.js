@@ -124,7 +124,7 @@ export default class TimeGrid extends Component {
     const groupedBackgroundEvents = resources.groupEvents(backgroundEvents)
 
     return resources.map(([id, resource], i) =>
-      range.map((date, jj) => {
+      range.map((date) => {
         let daysEvents = (groupedEvents.get(id) || []).filter((event) =>
           localizer.inRange(
             date,
@@ -154,7 +154,7 @@ export default class TimeGrid extends Component {
             resource={resource && id}
             components={components}
             isNow={localizer.isSameDate(date, now)}
-            key={i + '-' + jj}
+            key={i + '-' + +date}
             date={date}
             events={daysEvents}
             backgroundEvents={daysBackgroundEvents}
