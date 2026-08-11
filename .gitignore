@@ -38,3 +38,6 @@ node_modules
 # Sometimes we pack the module locally for testing
 *.tgz
 .claude
+
+# Personal settings
+.vscode/*
